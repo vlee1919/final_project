@@ -354,3 +354,94 @@ class Division(Calculation):
                 raise ValueError("Cannot divide by zero.")
             result /= value
         return result
+
+# Additional calculation types for final project.
+class Exponentiation(Calculation):
+    """
+    Exponentiation calculation subclass.
+    
+    Implements raising the first number to the power of the second number.
+    Examples:
+        [2, 3] -> 2 ** 3 = 8
+        [5, 0] -> 5 ** 0 = 1
+    """
+    __mapper_args__ = {"polymorphic_identity": "exponentiation"}
+
+    def get_result(self) -> float:
+        """
+        Calculate the result of raising the first value to the power of the second value.
+        
+        Returns:
+            float: The result of the exponentiation
+            
+        Raises:
+            ValueError: If inputs are not a list or if not exactly two numbers provided
+        """
+        if not isinstance(self.inputs, list):
+            raise ValueError("Inputs must be a list of numbers.")
+        if len(self.inputs) != 2:
+            raise ValueError("Inputs must be a list with exactly two numbers.")
+        base, exponent = self.inputs
+        return base ** exponent
+
+class SquareRoot(Calculation):
+    """
+    Square root calculation subclass.
+    
+    Implements calculating the square root of a single number.
+    Examples:
+        [16] -> sqrt(16) = 4
+        [25] -> sqrt(25) = 5
+    """
+    __mapper_args__ = {"polymorphic_identity": "square_root"}
+
+    def get_result(self) -> float:
+        """
+        Calculate the square root of the input value.
+        
+        Returns:
+            float: The square root of the input value
+            
+        Raises:
+            ValueError: If inputs are not a list or if not exactly one number provided,
+                        or if attempting to take the square root of a negative number
+        """
+        if not isinstance(self.inputs, list):
+            raise ValueError("Inputs must be a list of numbers.")
+        if len(self.inputs) != 1:
+            raise ValueError("Inputs must be a list with exactly one number.")
+        value = self.inputs[0]
+        if value < 0:
+            raise ValueError("Cannot take the square root of a negative number.")
+        return value ** 0.5
+
+class Modulus(Calculation):
+    """
+    Modulus calculation subclass.
+    
+    Implements the modulus operation (remainder of division).
+    Examples:
+        [10, 3] -> 10 % 3 = 1
+        [20, 6] -> 20 % 6 = 2
+    """
+    __mapper_args__ = {"polymorphic_identity": "modulus"}
+
+    def get_result(self) -> float:
+        """
+        Calculate the result of the modulus operation.
+        
+        Returns:
+            float: The result of the modulus operation
+            
+        Raises:
+            ValueError: If inputs are not a list or if not exactly two numbers provided,
+                        or if attempting to divide by zero
+        """
+        if not isinstance(self.inputs, list):
+            raise ValueError("Inputs must be a list of numbers.")
+        if len(self.inputs) != 2:
+            raise ValueError("Inputs must be a list with exactly two numbers.")
+        dividend, divisor = self.inputs
+        if divisor == 0:
+            raise ValueError("Cannot perform modulus by zero.")
+        return dividend % divisor
