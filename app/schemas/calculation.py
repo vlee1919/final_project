@@ -36,6 +36,9 @@ class CalculationType(str, Enum):
     SUBTRACTION = "subtraction"
     MULTIPLICATION = "multiplication"
     DIVISION = "division"
+    EXPONENTIATION = "exponentiation"
+    SQUARE_ROOT = "square_root"
+    MODULUS = "modulus"
 
 class CalculationBase(BaseModel):
     """
@@ -124,12 +127,30 @@ class CalculationBase(BaseModel):
         Raises:
             ValueError: If validation fails
         """
-        if len(self.inputs) < 2:
-            raise ValueError("At least two numbers are required for calculation")
+
+        if self.type == CalculationType.SQUARE_ROOT:
+            if len(self.inputs) != 1:
+                raise ValueError(
+                    "Square root requires exactly one number"
+                )
+        else: 
+            if len(self.inputs) < 2:
+                raise ValueError("At least two numbers are required for calculation")
+
         if self.type == CalculationType.DIVISION:
             # Prevent division by zero (skip the first value as numerator)
             if any(x == 0 for x in self.inputs[1:]):
                 raise ValueError("Cannot divide by zero")
+            
+        if self.type == CalculationType.MODULUS:
+            if self.inputs[1] == 0:
+                raise ValueError("Cannot perform modulus by zero")
+
+        if self.type == CalculationType.SQUARE_ROOT:
+            if self.inputs[0] < 0:
+                raise ValueError(
+                    "Cannot take the square root of a negative number"
+                )    
         return self
 
     model_config = ConfigDict(
