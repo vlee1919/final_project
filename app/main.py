@@ -93,7 +93,11 @@ def read_index(request: Request):
     
     Displays the welcome page with links to register and login.
     """
-    return templates.TemplateResponse("index.html", {"request": request})
+    #return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(
+    request=request,
+    name="index.html"
+    )
 
 @app.get("/login", response_class=HTMLResponse, tags=["web"])
 def login_page(request: Request):
@@ -102,7 +106,11 @@ def login_page(request: Request):
     
     Displays a form for users to enter credentials and log in.
     """
-    return templates.TemplateResponse("login.html", {"request": request})
+    #return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html"
+    )
 
 @app.get("/register", response_class=HTMLResponse, tags=["web"])
 def register_page(request: Request):
@@ -111,7 +119,11 @@ def register_page(request: Request):
     
     Displays a form for new users to create an account.
     """
-    return templates.TemplateResponse("register.html", {"request": request})
+   # return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="register.html"
+    )
 
 @app.get("/dashboard", response_class=HTMLResponse, tags=["web"])
 def dashboard_page(request: Request):
@@ -125,7 +137,11 @@ def dashboard_page(request: Request):
     
     JavaScript in this page calls the API endpoints to fetch and display data.
     """
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    #return templates.TemplateResponse("dashboard.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="dashboard.html"
+    )
 
 @app.get("/dashboard/view/{calc_id}", response_class=HTMLResponse, tags=["web"])
 def view_calculation_page(request: Request, calc_id: str):
@@ -142,7 +158,12 @@ def view_calculation_page(request: Request, calc_id: str):
     Returns:
         HTMLResponse: Rendered template with calculation ID passed to frontend
     """
-    return templates.TemplateResponse("view_calculation.html", {"request": request, "calc_id": calc_id})
+    #return templates.TemplateResponse("view_calculation.html", {"request": request, "calc_id": calc_id})
+    return templates.TemplateResponse(
+        request=request,
+        name="view_calculation.html",
+        context={"calc_id": calc_id}
+    )
 
 @app.get("/dashboard/edit/{calc_id}", response_class=HTMLResponse, tags=["web"])
 def edit_calculation_page(request: Request, calc_id: str):
@@ -159,8 +180,12 @@ def edit_calculation_page(request: Request, calc_id: str):
     Returns:
         HTMLResponse: Rendered template with calculation ID passed to frontend
     """
-    return templates.TemplateResponse("edit_calculation.html", {"request": request, "calc_id": calc_id})
-
+    #return templates.TemplateResponse("edit_calculation.html", {"request": request, "calc_id": calc_id})
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_calculation.html",
+        context={"calc_id": calc_id}
+    )
 
 # ------------------------------------------------------------------------------
 # Health Endpoint
