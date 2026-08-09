@@ -12,6 +12,8 @@ It demonstrates several advanced patterns:
 
 These models are designed for a calculator application that supports
 basic mathematical operations: addition, subtraction, multiplication, and division.
+
+Now includes additional operations: exponentiation, square root, and modulus.
 """
 
 from datetime import datetime
@@ -173,6 +175,7 @@ class AbstractCalculation:
         Raises:
             ValueError: If the calculation_type is not supported
         """
+        
         calculation_classes = {
             'addition': Addition,
             'subtraction': Subtraction,

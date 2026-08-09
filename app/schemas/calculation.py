@@ -52,15 +52,23 @@ class CalculationBase(BaseModel):
     """
     type: CalculationType = Field(
         ...,  # The ... means this field is required
-        description="Type of calculation (addition, subtraction, multiplication, division)",
+        description="Type of calculation (addition, subtraction, multiplication, division, exponentiation, square root, modulus)",
         example="addition"
     )
+
+    # REmove the min_items constraint to allow for single input for square root
     inputs: List[float] = Field(
-        ...,  # The ... means this field is required
+        ...,
         description="List of numeric inputs for the calculation",
-        example=[10.5, 3, 2],
-        min_items=2  # Ensures at least 2 numbers are provided
+        example=[10.5, 3, 2]
     )
+
+    # inputs: List[float] = Field(
+    #     ...,  # The ... means this field is required
+    #     description="List of numeric inputs for the calculation",
+    #     example=[10.5, 3, 2],
+    #     min_items=2  # Ensures at least 2 numbers are provided
+    # )
 
     @field_validator("type", mode="before")
     @classmethod
@@ -133,6 +141,17 @@ class CalculationBase(BaseModel):
                 raise ValueError(
                     "Square root requires exactly one number"
                 )
+        elif self.type == CalculationType.EXPONENTIATION:
+            if len(self.inputs) != 2:
+                raise ValueError(
+                    "Exponentiation requires exactly two numbers (base and exponent)"
+                )
+        elif self.type == CalculationType.MODULUS:
+            if len(self.inputs) != 2:
+                raise ValueError(
+                    "Modulus requires exactly two numbers (dividend and divisor)"
+                )
+        
         else: 
             if len(self.inputs) < 2:
                 raise ValueError("At least two numbers are required for calculation")
@@ -201,12 +220,19 @@ class CalculationUpdate(BaseModel):
     Note that all fields are optional (so clients can send partial updates),
     but if inputs are provided, they must pass validation.
     """
+    # Remove the min_items requirement to allow for square root input
     inputs: Optional[List[float]] = Field(
-        None,  # None means this field is optional
+        None,
         description="Updated list of numeric inputs for the calculation",
-        example=[42, 7],
-        min_items=2  # If provided, at least 2 items are required
+        example=[42, 7]
     )
+
+    # inputs: Optional[List[float]] = Field(
+    #     None,  # None means this field is optional
+    #     description="Updated list of numeric inputs for the calculation",
+    #     example=[42, 7],
+    #     min_items=2  # If provided, at least 2 items are required
+    # )
 
     @model_validator(mode='after')
     def validate_inputs(self) -> "CalculationUpdate":
