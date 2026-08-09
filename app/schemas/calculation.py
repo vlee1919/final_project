@@ -227,12 +227,6 @@ class CalculationUpdate(BaseModel):
         example=[42, 7]
     )
 
-    # inputs: Optional[List[float]] = Field(
-    #     None,  # None means this field is optional
-    #     description="Updated list of numeric inputs for the calculation",
-    #     example=[42, 7],
-    #     min_items=2  # If provided, at least 2 items are required
-    # )
 
     @model_validator(mode='after')
     def validate_inputs(self) -> "CalculationUpdate":

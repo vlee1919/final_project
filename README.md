@@ -1,264 +1,153 @@
-# 📦 Project Setup
+# Calculator Web API
+
+This project is a web-based calculator application built with **FastAPI** that allows users to perform calculations and manage their calculation history. The application includes user authentication, registration, and database-backed calculation history.
+
+### Features
+
+* **Calculations** — Perform mathematical calculations through the web application.
+* **User Registration** — Create a new user account.
+* **User Login** — Securely log in and access user-specific features.
+* **Calculation History (BREAD)** — Manage saved calculation history with **Browse, Read, Edit, Add, and Delete** operations. Users can save calculations, view their history, update existing calculations, and delete calculations.
+* **UPDATE: New Operations** — The calculator has been expanded with three additional mathematical operations:
+
+  * **Exponential** — Calculate a number raised to a given power.
+  * **Square Root** — Calculate the square root of a number.
+  * **Modulus** — Calculate the remainder after division.
+
 
 ---
 
-# 🧩 1. Install Homebrew (Mac Only)
+## Project Structure
 
-> Skip this step if you're on Windows.
-
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
-
-**Install Homebrew:**
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-**Verify Homebrew:**
-
-```bash
-brew --version
-```
-
-If you see a version number, you're good to go.
-
----
-
-# 🧩 2. Install and Configure Git
-
-## Install Git
-
-- **MacOS (using Homebrew)**
-
-```bash
-brew install git
-```
-
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
-
-```bash
-git --version
+```text
+FINAL_PROJECT/
+├── app/
+│   ├── auth/
+│   ├── core/
+│   ├── models/
+│   ├── schemas/
+│   └── main.py
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## Configure Git Globals
+## Getting Started
 
-Set your name and email so Git tracks your commits properly:
+### Prerequisites
+
+Before running the application, make sure you have the following installed:
+
+* Python
+* Docker
+* Docker Compose
+* Git
+
+---
+
+## Installation
+
+### 1. Clone the Repository
 
 ```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
+git clone git@github.com:vlee1919/final_project.git
 ```
 
-Confirm the settings:
+### 2. Configure Virtual Environment
 
 ```bash
-git config --list
+pyenv local 3.10.20
+python -m venv venv
+source venv/bin/activate
+```
+---
+
+## Running the Application
+
+### Using Docker Compose
+
+Build and start the application:
+
+```bash
+docker compose up --build
+```
+
+The application should then be available at:
+
+```text
+http://localhost:8000
+```
+
+### API Documentation
+
+FastAPI automatically provides interactive API documentation.
+
+**Swagger UI:**
+
+```text
+http://localhost:8000/docs
+```
+
+**ReDoc:**
+
+```text
+http://localhost:8000/redoc
 ```
 
 ---
 
-## Generate SSH Keys and Connect to GitHub
+## Docker Hub
 
-> Only do this once per machine.
+The application has been containerized and published to Docker Hub.
 
-1. Generate a new SSH key:
+**Docker Hub Repository:**
 
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
+[Docker Hub Repository](https://hub.docker.com/repository/docker/vl268/final_project/general)
 
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
+To pull the published image:
 
 ```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
-```bash
-git clone <repository-url>
-cd <repository-directory>
+docker pull vl268/final_project:latest
 ```
 
 ---
 
-# 🛠️ 4. Install Python 3.10+
+## API Features
 
-## Install Python
+### Authentication
 
-- **MacOS (Homebrew)**
+The application provides user authentication through:
 
-```bash
-brew install python
-```
-
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
+* User registration
+* User login
+* JWT-based authentication
+* Protected endpoints for authenticated users
 
 ---
 
-## Create and Activate a Virtual Environment
+## Database
 
-(Optional but recommended)
+The application uses **PostgreSQL** to store user information and calculation history.
 
-```bash
-python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate.bat  # Windows
-```
+**Database technologies:**
 
-### Install Required Packages
-
-```bash
-pip install -r requirements.txt
-```
+* PostgreSQL
+* SQLAlchemy ORM
+* Alembic migrations
 
 ---
 
-# 🐳 5. (Optional) Docker Setup
-
-> Skip if Docker isn't used in this module.
-
-## Install Docker
-
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-
-## Build Docker Image
+### Run All Tests
 
 ```bash
-docker build -t <image-name> .
+pytest
 ```
 
-## Run Docker Container
 
-```bash
-docker run -it --rm <image-name>
-```
-
----
-
-# 🚀 6. Running the Project
-
-- **Without Docker**:
-
-```bash
-python main.py
-```
-
-(or update this if the main script is different.)
-
-- **With Docker**:
-
-```bash
-docker run -it --rm <image-name>
-```
-
----
-
-# 📝 7. Submission Instructions
-
-After finishing your work:
-
-```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
-```
-
-Then submit the GitHub repository link as instructed.
-
----
-
-# 🔥 Useful Commands Cheat Sheet
-
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
-
----
-
-# 📋 Notes
-
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
-
----
-
-# 📎 Quick Links
-
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
