@@ -272,21 +272,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Function to calculate result for preview
   function calculatePreview(type, inputs) {
-    if (!inputs || inputs.length < 2) {
+    if (!inputs || inputs.length === 0) {
       return null;
     }
+
+    if (type !== 'square_root' && inputs.length < 2) {
+      return null;
+    }
+    // Square root only requires one input
+    if (type === 'square_root') {
+      if (!inputs || inputs.length !== 1) {
+        return null;
+      }
+    
+      if (inputs[0] < 0) {
+        return 'Cannot take the square root of a negative number';
+      }
+
+      return Math.sqrt(inputs[0]);
+    }
+
+    // All other operations require at least two inputs
+    // if (!inputs || inputs.length < 2) {
+    //   return null;
+    // }
     
     let result;
     switch (type) {
       case 'addition':
         result = inputs.reduce((a, b) => a + b, 0);
         break;
+
       case 'subtraction':
         result = inputs.reduce((a, b, i) => i === 0 ? a : a - b, inputs[0]);
         break;
+
       case 'multiplication':
         result = inputs.reduce((a, b) => a * b, 1);
         break;
+
       case 'division':
         // Avoid division by zero
         if (inputs.some((value, index) => index > 0 && value === 0)) {
@@ -294,6 +318,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         result = inputs.reduce((a, b, i) => i === 0 ? a : a / b, inputs[0]);
         break;
+
+      case 'exponentiation':
+        // Uses the first number as the base and the second as exponent
+        if (inputs.length !==2) {
+          return 'Exponentiation requires exactly two numbers';
+        }
+
+        result = Math.pow(inputs[0], inputs[1]);
+        break;
+
+      case 'modulus':
+        if (inputs.length !==2) {
+          return 'Modulus requires exactly two numbers.';
+        }
+
+        if (inputs[1] === 0) {
+          return 'Cannot perform modulus by zero';
+        }
+        result = inputs[0] % inputs[1];
+        break;
+
       default:
         return 'Unknown operation';
     }
@@ -310,11 +355,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   function updatePreview() {
     const type = calcTypeInput.value;
     const inputsString = calcInputsInput.value;
+
     const inputs = inputsString
       .split(',')
       .map(num => parseFloat(num.trim()))
       .filter(num => !isNaN(num));
-    
+  
+    // Square root requires one number
+    if (type === 'square_root') {
+      if (inputs.length !== 1) {
+        previewResult.innerHTML = `
+          <p class="text-gray-500 text-center">
+            Enter exactly one valid number to see the preview
+          </p>
+        `;
+        return;
+      }
+    } else {
+      // All other operations require at least two numbers
+      if (inputs.length === 0 || (type !== 'square_root' && inputs.length < 2)) {
+        previewResult.innerHTML = `
+          <p class="text-gray-500 text-center">
+            Enter at least two valid numbers to see the preview
+          </p>
+        `;
+        return;
+      }
+    }
+
+    const result = calculatePreview(type, inputs);
+     
     // Create appropriate operator symbol
     let operator;
     switch (type) {
@@ -330,12 +400,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       case 'division':
         operator = '÷';
         break;
+
+      case 'exponentiation':
+        operator = '^';
+        break;
+
+      case 'modulus':
+        operator = '%';
+        break;
+      
+      case 'square_root':
+        operator = '√';
+        break;
+
       default:
         operator = '?';
     }
-    
+
+
     // Update preview section
-    if (inputs.length < 2) {
+    if (inputs.length === 0 || (type !== 'square_root' && inputs.length < 2)) {
       previewResult.innerHTML = `
         <p class="text-gray-500 text-center">
           Enter at least two valid numbers to see the preview
@@ -344,23 +428,58 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     
-    const result = calculatePreview(type, inputs);
+    // const result = calculatePreview(type, inputs);
     
-    previewResult.innerHTML = `
-      <div class="text-center">
-        <div class="flex flex-col items-center justify-center bg-white rounded-lg p-4 shadow-sm">
-          ${inputs.map((input, i) => `
-            <div class="flex items-center w-full justify-center mb-2">
-              <span class="text-xl font-medium text-gray-800">${input}</span>
-              ${i < inputs.length - 1 ? `<span class="mx-2 text-xl text-blue-700 font-bold">${operator}</span>` : ''}
+  //   previewResult.innerHTML = `
+  //     <div class="text-center">
+  //       <div class="flex flex-col items-center justify-center bg-white rounded-lg p-4 shadow-sm">
+  //         ${inputs.map((input, i) => `
+  //           <div class="flex items-center w-full justify-center mb-2">
+  //             <span class="text-xl font-medium text-gray-800">${input}</span>
+  //             ${i < inputs.length - 1 ? `<span class="mx-2 text-xl text-blue-700 font-bold">${operator}</span>` : ''}
+  //           </div>
+  //         `).join('')}
+  //         <div class="w-full border-t border-gray-300 my-2"></div>
+  //         <div class="text-2xl font-bold text-blue-700">${result}</div>
+  //       </div>
+  //     </div>
+  //   `;
+  // }
+
+    if (type === 'square_root') {
+      previewResult.innerHTML = `
+        <div class="text-center">
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="text-xl font-medium text-gray-800">
+              √${inputs[0]}
             </div>
-          `).join('')}
-          <div class="w-full border-t border-gray-300 my-2"></div>
-          <div class="text-2xl font-bold text-blue-700">${result}</div>
+            <div class="w-full border-t border-gray-300 my-2"></div>
+            <div class="text-2xl font-bold text-blue-700">
+              ${result}
+            </div>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    } else {
+      previewResult.innerHTML = `
+        <div class="text-center">
+          <div class="flex flex-col items-center justify-center bg-white rounded-lg p-4 shadow-sm">
+            ${inputs.map((input, i) => `
+              <div class="flex items-center w-full justify-center mb-2">
+                <span class="text-xl font-medium text-gray-800">${input}</span>
+                ${i < inputs.length - 1 ? `<span class="mx-2 text-xl text-blue-700 font-bold">${operator}</span>` : ''}
+              </div>
+            `).join('')}
+            <div class="w-full border-t border-gray-300 my-2"></div>
+            <div class="text-2xl font-bold text-blue-700">
+              ${result}
+            </div>
+          </div>
+        </div>
+      `;
+    }
   }
+
 
   // 1) Load existing calculation
   async function loadCalculation() {
@@ -429,40 +548,97 @@ document.addEventListener('DOMContentLoaded', async () => {
       .map(num => parseFloat(num.trim()))
       .filter(num => !isNaN(num));
 
-    // Validate inputs
-    if (newInputs.length < 2) {
-      showError('Please enter at least two valid numbers separated by commas.');
-      
-      // Add error class to the input
-      calcInputsInput.classList.add('border-red-500', 'bg-red-50');
-      document.getElementById('inputHelp').classList.add('text-red-500');
-      document.getElementById('inputHelp').textContent = 'At least two valid numbers are required.';
-      
-      // Focus the input
-      calcInputsInput.focus();
-      
-      // Remove error styling after a delay or on input
-      setTimeout(() => {
-        calcInputsInput.classList.remove('border-red-500', 'bg-red-50');
-        document.getElementById('inputHelp').classList.remove('text-red-500');
-        document.getElementById('inputHelp').textContent = 'Enter two or more numbers separated by commas.';
-      }, 3000);
-      
-      calcInputsInput.addEventListener('input', function removeErrorOnce() {
-        calcInputsInput.classList.remove('border-red-500', 'bg-red-50');
-        document.getElementById('inputHelp').classList.remove('text-red-500');
-        document.getElementById('inputHelp').textContent = 'Enter two or more numbers separated by commas.';
-        calcInputsInput.removeEventListener('input', removeErrorOnce);
-      });
-      
-      return;
+
+    // Validate inputs based on calculation type
+    if (calcTypeInput.value === 'square_root') {
+      if (newInputs.length !== 1) {
+        showError('Square root requires exactly one number.');
+        return;
+      }
+
+      if (newInputs[0] < 0) {
+        showError('Cannot take the square root of a negative number.');
+        return;
+      }
+    } else {
+      if (newInputs.length < 2) {
+        showError('Please enter at least two valid numbers separated by commas.');
+        return;
+      }
     }
-    
+
     // Check for division by zero
-    if (calcTypeInput.value === 'division' && newInputs.some((value, index) => index > 0 && value === 0)) {
+    if (
+      calcTypeInput.value === 'division' &&
+      newInputs.some((value, index) => index > 0 && value === 0)
+    ) {
       showError('Division by zero is not allowed.');
       return;
     }
+
+    // Check for modulus by zero
+    if (
+      calcTypeInput.value === 'modulus' &&
+      newInputs[1] === 0
+    ) {
+      showError('Modulus by zero is not allowed.');
+      return;
+    }
+
+    // Exponentiation requires exactly two numbers
+    if (
+      calcTypeInput.value === 'exponentiation' &&
+      newInputs.length !== 2
+    ) {
+      showError('Exponentiation requires exactly two numbers.');
+      return;
+    }
+
+    // Modulus requires exactly two numbers
+    if (
+      calcTypeInput.value === 'modulus' &&
+      newInputs.length !== 2
+    ) {
+      showError('Modulus requires exactly two numbers.');
+      return;
+    }
+
+
+    
+    // Validate inputs
+    // if (newInputs.length < 2) {
+    //   showError('Please enter at least two valid numbers separated by commas.');
+      
+    //   // Add error class to the input
+    //   calcInputsInput.classList.add('border-red-500', 'bg-red-50');
+    //   document.getElementById('inputHelp').classList.add('text-red-500');
+    //   document.getElementById('inputHelp').textContent = 'At least two valid numbers are required.';
+      
+    //   // Focus the input
+    //   calcInputsInput.focus();
+      
+    //   // Remove error styling after a delay or on input
+    //   setTimeout(() => {
+    //     calcInputsInput.classList.remove('border-red-500', 'bg-red-50');
+    //     document.getElementById('inputHelp').classList.remove('text-red-500');
+    //     document.getElementById('inputHelp').textContent = 'Enter two or more numbers separated by commas.';
+    //   }, 3000);
+      
+    //   calcInputsInput.addEventListener('input', function removeErrorOnce() {
+    //     calcInputsInput.classList.remove('border-red-500', 'bg-red-50');
+    //     document.getElementById('inputHelp').classList.remove('text-red-500');
+    //     document.getElementById('inputHelp').textContent = 'Enter two or more numbers separated by commas.';
+    //     calcInputsInput.removeEventListener('input', removeErrorOnce);
+    //   });
+      
+    //   return;
+    // }
+    
+    // Check for division by zero
+    // if (calcTypeInput.value === 'division' && newInputs.some((value, index) => index > 0 && value === 0)) {
+    //   showError('Division by zero is not allowed.');
+    //   return;
+    // }
 
     // Show loading state on button
     submitButton.disabled = true;
