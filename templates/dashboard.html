@@ -54,6 +54,9 @@
           <option value="subtraction">Subtraction</option>
           <option value="multiplication">Multiplication</option>
           <option value="division">Division</option>
+          <option value="exponentiation">Exponentiation</option>
+          <option value="modulus">Modulus</option>
+          <option value="square_root">Square Root</option>
         </select>
       </div>
       <!-- Inputs -->
@@ -410,20 +413,60 @@ document.addEventListener('DOMContentLoaded', function() {
       .map(num => parseFloat(num.trim()))
       .filter(num => !isNaN(num));
 
-    if (inputs.length < 2) {
-      showError('Please enter at least two valid numbers, separated by commas');
-      
-      // Highlight the input field with an error state
-      const inputField = document.getElementById('calcInputs');
-      inputField.classList.add('border-red-500');
-      inputField.focus();
-      
-      // Remove error highlight after 3 seconds or when user types
-      setTimeout(() => inputField.classList.remove('border-red-500'), 3000);
-      inputField.addEventListener('input', () => inputField.classList.remove('border-red-500'), { once: true });
-      
-      return;
+    const calculationType = document.getElementById('calcType').value;
+
+    // Square root requires exactly one number
+    if (calculationType === 'square_root') {
+      if (inputs.length !== 1) {
+        showError('Square root requires exactly one number.');
+
+        const inputField = document.getElementById('calcInputs');
+        inputField.classList.add('border-red-500');
+        inputField.focus();
+
+        setTimeout(() => inputField.classList.remove('border-red-500'), 3000);
+        inputField.addEventListener(
+          'input',
+          () => inputField.classList.remove('border-red-500'),
+          { once: true }
+        );
+
+        return;
+      }
+    } else {
+      // All other operations require at least two numbers
+      if (inputs.length < 2) {
+        showError('Please enter at least two valid numbers, separated by commas');
+
+        const inputField = document.getElementById('calcInputs');
+        inputField.classList.add('border-red-500');
+        inputField.focus();
+
+        setTimeout(() => inputField.classList.remove('border-red-500'), 3000);
+        inputField.addEventListener(
+          'input',
+          () => inputField.classList.remove('border-red-500'),
+          { once: true }
+        );
+
+        return;
+      }
     }
+
+    // if (inputs.length < 2) {
+    //   showError('Please enter at least two valid numbers, separated by commas');
+      
+    //   // Highlight the input field with an error state
+    //   const inputField = document.getElementById('calcInputs');
+    //   inputField.classList.add('border-red-500');
+    //   inputField.focus();
+      
+    //   // Remove error highlight after 3 seconds or when user types
+    //   setTimeout(() => inputField.classList.remove('border-red-500'), 3000);
+    //   inputField.addEventListener('input', () => inputField.classList.remove('border-red-500'), { once: true });
+      
+    //   return;
+    // }
 
     const newCalc = {
       type: document.getElementById('calcType').value,
