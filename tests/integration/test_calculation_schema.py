@@ -54,18 +54,55 @@ def test_calculation_create_invalid_inputs():
     # Ensure that our custom error message is present (case-insensitive)
     assert "input should be a valid list" in error_message.lower(), error_message
 
-def test_calculation_create_unsupported_type():
-    """Test CalculationCreate fails if an unsupported calculation type is provided."""
+# Test for new calculation types: exponentiation, square root, and modulus
+@pytest.mark.parametrize(
+    "calculation_type, inputs",
+    [
+        ("exponentiation", [2, 3]),
+        ("square_root", [25]),
+        ("modulus", [10, 3]),
+    ]
+)
+def test_calculation_create_new_operations(calculation_type, inputs):
+    """Test that the three new calculation types are accepted."""
     data = {
-        "type": "square_root",  # Unsupported type
-        "inputs": [25],
+        "type": calculation_type,
+        "inputs": inputs,
         "user_id": uuid4()
     }
+
+    calc = CalculationCreate(**data)
+
+    assert calc.type.value == calculation_type
+    assert calc.inputs == inputs
+
+def test_calculation_create_unsupported_type():
+    """Test CalculationCreate fails for an unsupported calculation type."""
+    data = {
+        "type": "invalid_operation",
+        "inputs": [10, 5],
+        "user_id": uuid4()
+    }
+
     with pytest.raises(ValidationError) as exc_info:
         CalculationCreate(**data)
+
     error_message = str(exc_info.value).lower()
-    # Check that the error message indicates the value is not permitted.
-    assert "one of" in error_message or "not a valid" in error_message
+
+    assert "one of" in error_message or "valid" in error_message
+
+# def test_calculation_create_unsupported_type():
+#     """Test CalculationCreate fails if an unsupported calculation type is provided."""
+#     data = {
+#         "type": "square_root",  # Unsupported type
+#         "inputs": [25],
+#         "user_id": uuid4()
+#     }
+#     with pytest.raises(ValidationError) as exc_info:
+#         CalculationCreate(**data)
+#     error_message = str(exc_info.value).lower()
+#     # Check that the error message indicates the value is not permitted.
+#     assert "one of" in error_message or "not a valid" in error_message
 
 def test_calculation_update_valid():
     """Test a valid partial update with CalculationUpdate."""

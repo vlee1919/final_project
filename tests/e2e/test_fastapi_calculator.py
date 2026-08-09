@@ -5,6 +5,7 @@ import requests
 
 # Import the Calculation model for direct model tests.
 from app.models.calculation import Calculation
+from app.schemas.calculation import CalculationCreate
 
 # ---------------------------------------------------------------------------
 # Helper Fixtures and Functions
@@ -229,6 +230,100 @@ def test_create_calculation_division(base_url: str):
     # Expected result: 100 / 2 / 5 = 10
     assert "result" in data and data["result"] == 10, f"Expected result 10, got {data.get('result')}"
 
+# New Operation Tests
+def test_create_calculation_exponentiation(base_url: str):
+    user_data = {
+        "first_name": "Calc",
+        "last_name": "Exponent",
+        "email": f"calc.exp{uuid4()}@example.com",
+        "username": f"calc_exp_{uuid4()}",
+        "password": "SecurePass123!",
+        "confirm_password": "SecurePass123!"
+    }
+
+    token_data = register_and_login(base_url, user_data)
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    url = f"{base_url}/calculations"
+
+    payload = {
+        "type": "exponentiation",
+        "inputs": [2, 3],
+        "user_id": "ignored"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    assert response.status_code == 201, (
+        f"Exponentiation calculation creation failed: {response.text}"
+    )
+
+    data = response.json()
+
+    assert data["result"] == 8
+
+def test_create_calculation_square_root(base_url: str):
+    user_data = {
+        "first_name": "Calc",
+        "last_name": "Root",
+        "email": f"calc.root{uuid4()}@example.com",
+        "username": f"calc_root_{uuid4()}",
+        "password": "SecurePass123!",
+        "confirm_password": "SecurePass123!"
+    }
+
+    token_data = register_and_login(base_url, user_data)
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    url = f"{base_url}/calculations"
+
+    payload = {
+        "type": "square_root",
+        "inputs": [16],
+        "user_id": "ignored"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    assert response.status_code == 201, (
+        f"Square root calculation creation failed: {response.text}"
+    )
+
+    data = response.json()
+
+    assert data["result"] == 4
+
+def test_create_calculation_modulus(base_url: str):
+    user_data = {
+        "first_name": "Calc",
+        "last_name": "Modulus",
+        "email": f"calc.mod{uuid4()}@example.com",
+        "username": f"calc_mod_{uuid4()}",
+        "password": "SecurePass123!",
+        "confirm_password": "SecurePass123!"
+    }
+
+    token_data = register_and_login(base_url, user_data)
+    headers = {"Authorization": f"Bearer {token_data['access_token']}"}
+
+    url = f"{base_url}/calculations"
+
+    payload = {
+        "type": "modulus",
+        "inputs": [10, 3],
+        "user_id": "ignored"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    assert response.status_code == 201, (
+        f"Modulus calculation creation failed: {response.text}"
+    )
+
+    data = response.json()
+
+    assert data["result"] == 1
+
 def test_list_get_update_delete_calculation(base_url: str):
     user_data = {
         "first_name": "Calc",
@@ -318,3 +413,69 @@ def test_model_division():
     with pytest.raises(ValueError):
         calc_zero = Calculation.create("division", dummy_user_id, [100, 0])
         calc_zero.get_result()
+
+# New test models      
+def test_model_exponentiation():
+    dummy_user_id = uuid4()
+
+    calc = Calculation.create(
+        "exponentiation",
+        dummy_user_id,
+        [2, 3]
+    )
+
+    result = calc.get_result()
+
+    assert result == 8
+
+def test_model_square_root():
+    dummy_user_id = uuid4()
+
+    calc = Calculation.create(
+        "square_root",
+        dummy_user_id,
+        [16]
+    )
+
+    result = calc.get_result()
+
+    assert result == 4
+
+def test_model_modulus():
+    dummy_user_id = uuid4()
+
+    calc = Calculation.create(
+        "modulus",
+        dummy_user_id,
+        [10, 3]
+    )
+
+    result = calc.get_result()
+
+    assert result == 1
+
+def test_model_square_root_negative():
+    dummy_user_id = uuid4()
+
+    calc = Calculation.create(
+        "square_root",
+        dummy_user_id,
+        [-16]
+    )
+
+    with pytest.raises(ValueError, match="square root"):
+        calc.get_result()
+
+def test_model_modulus_by_zero():
+    dummy_user_id = uuid4()
+
+    calc = Calculation.create(
+        "modulus",
+        dummy_user_id,
+        [10, 0]
+    )
+
+    with pytest.raises(ValueError, match="modulus by zero"):
+        calc.get_result()
+
+
