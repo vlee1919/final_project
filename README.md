@@ -13,7 +13,7 @@ This project is a web-based calculator application built with **FastAPI** that a
   * **Exponential** — Calculate a number raised to a given power.
   * **Square Root** — Calculate the square root of a number.
   * **Modulus** — Calculate the remainder after division.
-<img src="screenshots/Screenshot1.jpg" alt="Screenshot1" width="600">
+<img src="screenshot/Screenshot1.jpg" alt="Screenshot1" width="600">
 
 ---
 
